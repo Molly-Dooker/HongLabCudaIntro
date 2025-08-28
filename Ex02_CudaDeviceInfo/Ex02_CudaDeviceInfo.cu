@@ -106,6 +106,12 @@ int main()
     printCudaDeviceInfo();
  
     CUDA_CHECK(cudaDeviceReset());
+#if defined(__linux__)
+    cudaDeviceSynchronize();
+#endif
+
+
+    fflush(stdout);
 
     return 0;
 }
