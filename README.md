@@ -1,3 +1,5 @@
+nvcc hello-cpp.cu -o hello
+
 # [홍정모 연구소](https://honglab.co.kr/)
 
 - 온라인 강의노트 같은 2차 저작물에는 참고자료에 "[홍정모 연구소](https://honglab.co.kr/)"를 꼭 적어주세요.

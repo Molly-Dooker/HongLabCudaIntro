@@ -23,7 +23,7 @@ __global__ void addKernel(const int* a, const int* b, int* c, int size)
 
     c[i] = a[i] + b[i];
 
-    // printf("ThreadIdx(% u, % u, % u)\n", threadIdx.x, threadIdx.y, threadIdx.z);
+    printf("ThreadIdx(% u, % u, % u)\n", threadIdx.x, threadIdx.y, threadIdx.z);
 }
 
 int main()

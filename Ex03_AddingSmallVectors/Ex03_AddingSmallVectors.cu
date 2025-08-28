@@ -17,18 +17,11 @@ void printVector(const vector<T>& a)
 	cout << endl;
 }
 
-// 앞에 붙는 __global__은 host에서 실행시킬 수 있는 CUDA 커널(kernel) 함수라는 의미입니다.
-// __host__ : CPU에서 호출하고 CPU에서 실행되는 함수
-// __device__ : GPU에서 호출하고 GPU에서 실행되는 함수
-// __host__ __device__ : (함께 사용하면) CPU/GPU 모두에서 실행될 수 있는 함수, 주로 간단한 보조 함수
 __global__ void addKernel(const int* a, const int* b, int* c)
 {
 	int i = threadIdx.x;
-
-	// c[i] = TODO;
-
-	// 안내: 쿠다에서도 printf()를 사용할 수 있습니다. 기본적인 디버깅에 활용하세요.
-	// printf("ThreadIdx(% u, % u, % u)\n", threadIdx.x, threadIdx.y, threadIdx.z);
+    c[i] = a[i]+b[i];
+	printf("ThreadIdx(% u, % u, % u)\n", threadIdx.x, threadIdx.y, threadIdx.z);
 }
 
 int main()
@@ -62,7 +55,7 @@ int main()
 		cudaMemcpy(dev_b, b.data(), size * sizeof(int), cudaMemcpyHostToDevice);
 
 		// 블럭 1개 * 쓰레드 size개
-		// addKernel < <<1, TODO >> > (dev_a, dev_b, dev_c);
+		addKernel <<<1, size >>> (dev_a, dev_b, dev_c);
 		// addKernel<<<블럭이 몇 개 인지, 각 블럭당 쓰레드가 몇 개인지 >>>(dev_a, dev_b, dev_c);
 
 		// 안내:
@@ -101,6 +94,6 @@ int main()
 		}
 
 	cout << "Correct" << endl;
-
+	fflush(stdout);
 	return 0;
 }
