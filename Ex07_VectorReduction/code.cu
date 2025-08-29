@@ -83,7 +83,7 @@ __global__ void convergentSumReductionKernel(float *input,
 
     for (unsigned int stride = blockDim.x; stride >= 1; stride /= 2) {
         if (threadIdx.x < stride) {
-            // TODO: i를 사용해도 되고 threadIdx.x를 직접 사용해도 됩니다.
+            input[i]+=input[i+stride];
         }
         __syncthreads(); // <- 같은 블럭 안에 있는 쓰레드들 동기화
     }
@@ -93,7 +93,8 @@ __global__ void convergentSumReductionKernel(float *input,
 
 __global__ void sharedMemorySumReductionKernel(float *input, float *output) {
 
-    // __shared__ float inputShared[1024];
+    // __shared__ float inputShared[1024]; 
+    // shm 사이즈 하드코딩 가능하긴함
 
     extern __shared__ float inputShared[]; // <- 블럭 안에서 여러 쓰레드들이 공유하는 빠른 메모리
 
@@ -106,7 +107,7 @@ __global__ void sharedMemorySumReductionKernel(float *input, float *output) {
         __syncthreads();
 
         if (threadIdx.x < stride) {
-            // TODO:
+            inputShared[t]+=inputShared[t+stride];
         }
     }
     if (t == 0)
@@ -125,7 +126,7 @@ __global__ void segmentedSumReductionKernel(float *input, float *output) {
 
 int main(int argc, char *argv[]) {
 
-    const int size = 1024 * 1024 * 32;
+    const int size = 1<<10;
 
     // 배열 만들기
     vector<float> arr(size);
@@ -145,7 +146,7 @@ int main(int argc, char *argv[]) {
     float *dev_input;
     float *dev_output;
 
-    int threadsPerBlock = 1024;
+    int threadsPerBlock = 1<<9;
 
     cudaMalloc(&dev_input, size * sizeof(float));
     cudaMalloc(&dev_output, sizeof(float));
@@ -158,8 +159,7 @@ int main(int argc, char *argv[]) {
 
     // 주의: size = threadsPerBlock * 2 라고 가정 (블럭 하나만 사용)
     // timedRun("GPU Sum", [&]() {
-    //     convergentSumReductionKernel<<<1, threadsPerBlock>>>(dev_input, dev_output); // 블럭이
-    //     하나일 때만 사용
+    //     convergentSumReductionKernel<<<1, threadsPerBlock>>>(dev_input, dev_output); // 블럭이 하나일 때만 사용
     // });
 
     // timedRun("GPU Sum", [&]() {
